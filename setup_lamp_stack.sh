@@ -31,3 +31,5 @@ sudo systemctl reload apache2
 echo "MySQL init starts"
 
 sudo mysql < /vagrant/setup.sql
+
+echo "Done"
