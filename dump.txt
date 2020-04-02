@@ -1,0 +1,103 @@
+sudo mysql_secure_installation
+From here, you can just press Y and then ENTER to accept the defaults for all the subsequent questions.
+
+Fix authentication issue caused by Ubuntu using auth_socket plugin by default for the root user.
+You can set the root user to use the mysql_native_password instead to fix this issue, and we will have to set the root password again to correct this.
+
+log in as sudo to mysql using the username and password set before.
+
+sudo mysql -u root
+in MySQL enter the following
+
+USE mysql;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+Note:
+For security make this password different than your server's password, and dont use the root user in any application that requires a database to store and pull data from.
+
+FLUSH PRIVILEGES;
+exit;
+Step 3
+We download the latest Adminer into our Apache web servers root folder
+
+sudo mkdir /usr/share/adminer
+sudo wget "http://www.adminer.org/latest.php" -O /usr/share/adminer/latest.php
+sudo ln -s /usr/share/adminer/latest.php /usr/share/adminer/adminer.php
+echo "Alias /adminer.php /usr/share/adminer/adminer.php" | sudo tee /etc/apache2/conf-available/adminer.conf
+sudo a2enconf adminer.conf
+reload the Apache config
+
+sudo systemctl reload apache2 
+
+
+elcome to Ubuntu 18.04.3 LTS (GNU/Linux 4.15.0-64-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Fri Mar  6 00:47:27 UTC 2020
+
+  System load:  0.38              Processes:             116
+  Usage of /:   15.0% of 9.63GB   Users logged in:       0
+  Memory usage: 32%               IP address for enp0s3: 10.0.2.15
+  Swap usage:   0%
+
+
+110 packages can be updated.
+66 updates are security updates.
+
+
+vagrant@ubuntu-bionic:~$ mysql
+ERROR 1045 (28000): Access denied for user 'vagrant'@'localhost' (using password: NO)
+vagrant@ubuntu-bionic:~$ mysql -u root -p
+Enter password:
+ERROR 1698 (28000): Access denied for user 'root'@'localhost'
+vagrant@ubuntu-bionic:~$ mysql -u root -p
+Enter password:
+ERROR 1698 (28000): Access denied for user 'root'@'localhost'
+vagrant@ubuntu-bionic:~$ grep 'temporary password' /var/log/mysqld.log
+grep: /var/log/mysqld.log: No such file or directory
+vagrant@ubuntu-bionic:~$ mysql
+ERROR 1045 (28000): Access denied for user 'vagrant'@'localhost' (using password: NO)
+vagrant@ubuntu-bionic:~$ mysql -u root -p 
+Enter password:
+ERROR 1698 (28000): Access denied for user 'root'@'localhost'
+vagrant@ubuntu-bionic:~$ mysql -u root -p
+Enter password:
+ERROR 1698 (28000): Access denied for user 'root'@'localhost'
+vagrant@ubuntu-bionic:~$ mysql_secure_installation
+
+Securing the MySQL server deployment.
+
+Enter password for user root: 
+Error: Access denied for user 'root'@'localhost'
+vagrant@ubuntu-bionic:~$ sudo mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 13
+Server version: 5.7.29-0ubuntu0.18.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> CREATE USER 'adminerlogin';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'adminerlogin'@%;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use 
+near '%' at line 1
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'adminerlogin'@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> ALTER USER 'user-name'@'localhost' IDENTIFIED BY 'NEW_USER_PASSWORD';
+ERROR 1396 (HY000): Operation ALTER USER failed for 'user-name'@'localhost'
+mysql> ALTER USER 'adminerlogin' IDENTIFIED BY 'password';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
